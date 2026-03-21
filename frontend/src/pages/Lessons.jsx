@@ -1,14 +1,16 @@
 import { useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLessonsContext } from '../hooks/useLessonsContext'
 
 // components
-import LessonDetails from '../components/LessonDetails'
+import LessonCard from '../components/LessonCard'
 
 const Lessons = () => {
   const { lessons, dispatch, loading, error } = useLessonsContext()
+  const navigate = useNavigate()
 
   const handleViewExercises = (lesson) => {
-    console.log(`View exercises for: ${lesson.title}`)
+    navigate(`/lessons/${lesson._id}`)
   }
 
   useEffect(() => {
@@ -41,7 +43,7 @@ const Lessons = () => {
       <div className="lessons">
         {lessons && lessons.length > 0 ? (
           lessons.map((lesson) => (
-            <LessonDetails key={lesson._id} lesson={lesson} onViewExercises={handleViewExercises} />
+            <LessonCard key={lesson._id} lesson={lesson} onViewExercises={handleViewExercises} />
           ))
         ) : (
           <p className="status-message">No lessons available yet.</p>

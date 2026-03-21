@@ -1,4 +1,4 @@
-const LessonDetails = ({ lesson, onViewExercises }) => {
+const LessonCard = ({ lesson, onViewExercises }) => {
   return (
     <button
       type="button"
@@ -24,4 +24,4 @@ const LessonDetails = ({ lesson, onViewExercises }) => {
   )
 }
 
-export default LessonDetails
+export default LessonCard

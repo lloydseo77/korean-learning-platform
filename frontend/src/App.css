@@ -1,7 +1,14 @@
 #root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#content {
   max-width: 1080px;
   margin: 0 auto;
   padding: 2rem 1.25rem 3rem;
+  width: 100%;
 }
 
 .App {
@@ -142,4 +149,145 @@
   background: #fff1f1;
   border-color: #ffc9c9;
   color: #8a2e2e;
+}
+
+.lesson-details-page {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.back-button {
+  display: inline-block;
+  margin-bottom: 2rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.16s ease;
+}
+
+.back-button:hover {
+  color: #1e40af;
+}
+
+.lesson-details {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border: 1px solid #c9dcff;
+  border-radius: 14px;
+  padding: 2rem;
+  color: #173d7b;
+}
+
+.lesson-details-title {
+  margin: 0 0 1rem 0;
+  font-size: 2rem;
+  color: #123b7a;
+}
+
+.lesson-details-description {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  color: #3f5f96;
+  line-height: 1.6;
+}
+
+.start-exercises-button {
+  display: inline-block;
+  margin-top: 2rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.start-exercises-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(34, 89, 173, 0.24);
+}
+
+.start-exercises-button:active {
+  transform: translateY(0);
+}
+
+/* Navbar Styles */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #ffffff 0%, #f8fbff 100%);
+  border-bottom: 2px solid #e0ebf7;
+  padding: 1rem 2rem;
+  gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.navbar-start {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #0f3a7d;
+  text-decoration: none;
+  transition: color 0.16s ease;
+}
+
+.navbar-brand:hover {
+  color: #1e40af;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  font-size: 0.95rem;
+  color: #3f5f96;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.16s ease;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 0.2rem;
+}
+
+.nav-link:hover {
+  color: #1e40af;
+  border-bottom-color: #2563eb;
+}
+
+.navbar-end {
+  display: flex;
+  align-items: center;
+}
+
+.profile-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 1.3rem;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  cursor: pointer;
+}
+
+.profile-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(34, 89, 173, 0.3);
+}
+
+.profile-button:active {
+  transform: scale(0.95);
 }

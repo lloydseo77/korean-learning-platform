@@ -1,18 +1,16 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Lessons from './pages/Lessons'
 import Dashboard from './pages/Dashboard'
+import LessonDetails from './pages/LessonDetails'
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/lessons" element={<Lessons />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/lessons" element={<Lessons />} />
+      <Route path="/lessons/:id" element={<LessonDetails />} />
+    </Routes>
   )
 }
 
