@@ -2,6 +2,7 @@
 // Contains middleware and routes logic
 const express = require('express')
 const lessonRoutes = require('./routes/lessons')
+const authRoutes = require('./routes/auth')
 
 const app = express()
 
@@ -20,5 +21,6 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/lessons', lessonRoutes)
+app.use('/api/auth', authRoutes)
 
 module.exports = app
