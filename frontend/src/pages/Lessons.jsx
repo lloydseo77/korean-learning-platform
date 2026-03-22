@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useLessonsContext } from '../hooks/useLessonsContext'
+import { useAuthContext } from '../hooks/useAuthContext'
 
 // components
 import LessonCard from '../components/LessonCard'
 
 const Lessons = () => {
   const { lessons, dispatch, loading, error } = useLessonsContext()
+  const { token } = useAuthContext()
   const navigate = useNavigate()
 
   const handleViewExercises = (lesson) => {
@@ -17,7 +19,11 @@ const Lessons = () => {
     const fetchLessons = async () => {
       dispatch({ type: 'SET_LOADING' })
       try {
-        const response = await fetch('/api/lessons')
+        const response = await fetch('/api/lessons', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
         const json = await response.json()
 
         if (response.ok) {
@@ -30,8 +36,10 @@ const Lessons = () => {
       }
     }
 
-    fetchLessons()
-  }, [dispatch])
+    if (token) {
+      fetchLessons()
+    }
+  }, [dispatch, token])
 
   if (loading) return <div className="status-message">Loading lessons...</div>
   if (error) return <div className="status-message error-message">Error: {error}</div>
