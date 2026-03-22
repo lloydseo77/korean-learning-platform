@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../hooks/useAuthContext'
 
 const Navbar = () => {
-  const { user, logout } = useAuthContext()
+  const { user, logout, loading } = useAuthContext()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -38,7 +38,7 @@ const Navbar = () => {
               Log Out
             </button>
           </>
-        ) : (
+        ) : !loading ? (
           <>
             <Link to="/login" className="nav-link">
               Log In
@@ -47,7 +47,7 @@ const Navbar = () => {
               Sign Up
             </Link>
           </>
-        )}
+        ) : null}
       </div>
     </nav>
   )

@@ -50,7 +50,21 @@ const loginUser = async (req, res) => {
     }
 }
 
+// get current user
+const getCurrentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId)
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' })
+        }
+        res.json({ user: user.toJSON() })
+    } catch (error) {
+        res.status(400).json({ error: error.message })
+    }
+}
+
 module.exports = {
     registerUser,
-    loginUser
+    loginUser,
+    getCurrentUser
 }

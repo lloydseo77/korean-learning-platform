@@ -1,11 +1,11 @@
-import { createContext, useReducer, useContext } from 'react'
+import { createContext, useReducer, useContext, useEffect } from 'react'
 
 export const AuthContext = createContext()
 
 const initialState = {
     user: null,
     token: localStorage.getItem('token') || null,
-    loading: false,
+    loading: true,
     error: null
 }
 
@@ -74,6 +74,32 @@ export const AuthContextProvider = ({ children }) => {
         localStorage.removeItem('token')
         dispatch({ type: 'LOGOUT' })
     }
+
+    // get current user function
+    const getCurrentUser = async () => {
+        const token = localStorage.getItem('token')
+        if (!token) {
+            return
+        }
+        try {
+            const response = await fetch('/api/auth/me', {
+                method: 'GET',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            const data = await response.json()
+            if (!response.ok) {
+                dispatch({ type: 'SET_ERROR', payload: data.error })
+                return
+            }
+            dispatch({ type: 'LOGIN', payload: { user: data.user, token } })
+        } catch (error) {
+            dispatch({ type: 'SET_ERROR', payload: error.message })
+        }
+    }
+
+    useEffect(() => {
+        getCurrentUser()
+    }, [])
 
     return (
         <AuthContext.Provider value={{ ...state, login, register, logout }}>
