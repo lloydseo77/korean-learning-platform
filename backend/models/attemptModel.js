@@ -12,23 +12,27 @@ const attemptSchema = new Schema({
         ref: 'User',
         required: true
     },
-    exerciseId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Exercise',
-        required: true
-    },
     lessonId: {
         type: Schema.Types.ObjectId,
         ref: 'Lesson',
         required: true
     },
+    pageIndex: {
+        type: Number,
+        required: true,
+        default: 0
+    },
     userAnswer: {
-        type: String,
+        type: Schema.Types.Mixed,
         required: true
     },
     isCorrect: {
         type: Boolean,
         required: true
+    },
+    xpEarned: {
+        type: Number,
+        default: 0
     },
     feedback: {
         type: String

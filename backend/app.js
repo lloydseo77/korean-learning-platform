@@ -3,6 +3,8 @@
 const express = require('express')
 const lessonRoutes = require('./routes/lessons')
 const authRoutes = require('./routes/auth')
+const unitRoutes = require('./routes/units')
+const attemptRoutes = require('./routes/attempts')
 
 const app = express()
 
@@ -22,5 +24,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/lessons', lessonRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/units', unitRoutes)
+app.use('/api/attempts', attemptRoutes)
 
 module.exports = app

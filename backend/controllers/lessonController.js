@@ -1,13 +1,10 @@
 const Lesson = require('../models/lessonModel')
-const Context = require('../models/contextModel')
-const Exercise = require('../models/exerciseModel')
 const mongoose = require('mongoose')
 
 // get all lessons
 const getLessons = async (req, res) => {
     try {
         const lessons = await Lesson.find({})
-            .populate('contexts')
             .sort({order: 1})
 
         res.status(200).json(lessons)
@@ -25,21 +22,27 @@ const getLesson = async (req, res) => {
             return res.status(404).json({error: 'No such lesson'})
         }
 
-        const lesson = await Lesson.findById(id).populate('contexts')
+        const lesson = await Lesson.findById(id)
         
         if (!lesson) {
             return res.status(404).json({error: 'No such lesson'})
         }
 
-        // Get exercises for this lesson
-        const exercises = await Exercise.find({lessonId: id})
-            .populate('contextId')
+        res.status(200).json(lesson)
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+}
+
+//  get lessons by unit
+const getLessonsByUnit = async (req, res) => {
+    try {
+        const { unitNumber } = req.params
+
+        const lessons = await Lesson.find({ unit: unitNumber })
             .sort({order: 1})
 
-        res.status(200).json({
-            ...lesson.toObject(),
-            exercises
-        })
+        res.status(200).json(lessons)
     } catch (error) {
         res.status(500).json({error: error.message})
     }
@@ -47,5 +50,6 @@ const getLesson = async (req, res) => {
 
 module.exports = {
     getLessons,
-    getLesson
+    getLesson,
+    getLessonsByUnit
 }
