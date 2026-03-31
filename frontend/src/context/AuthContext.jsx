@@ -79,6 +79,8 @@ export const AuthContextProvider = ({ children }) => {
     const getCurrentUser = async () => {
         const token = localStorage.getItem('token')
         if (!token) {
+            // No token, so not logged in - set loading to false
+            dispatch({ type: 'LOGOUT' })
             return
         }
         try {

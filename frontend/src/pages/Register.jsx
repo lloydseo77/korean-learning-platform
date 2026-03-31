@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthContext } from '../hooks/useAuthContext'
 
@@ -6,15 +6,19 @@ const Register = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
-  const { register, error, loading } = useAuthContext()
+  const { register, error, loading, user } = useAuthContext()
   const navigate = useNavigate()
+
+  // Redirect to dashboard once user is logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/')
+    }
+  }, [user, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     await register(email, password, name)
-    if (!error) {
-      navigate('/lessons')
-    }
   }
 
   return (

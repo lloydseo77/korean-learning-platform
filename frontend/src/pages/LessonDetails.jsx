@@ -1,21 +1,28 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useLessonsContext } from '../hooks/useLessonsContext'
 import { useAuthContext } from '../hooks/useAuthContext'
 
 const LessonDetails = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
     const { lessons } = useLessonsContext()
     const { user, token, loading: authLoading } = useAuthContext()
     const [currentPageIndex, setCurrentPageIndex] = useState(0)
     const [selectedAnswers, setSelectedAnswers] = useState({}) // Map: pageIndex -> selectedOptionIndex
     const [feedbacks, setFeedbacks] = useState({}) // Map: pageIndex -> feedback object
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [totalXpEarned, setTotalXpEarned] = useState(0)
+    const [isLessonComplete, setIsLessonComplete] = useState(false)
+    const [completionSubmitting, setCompletionSubmitting] = useState(false)
 
     // For drag-and-drop matching exercises
     const [draggedPairIndex, setDraggedPairIndex] = useState(null)
     const [matches, setMatches] = useState({}) // Maps right item index -> left item index
     const [matchFeedback, setMatchFeedback] = useState({}) // Feedback for each match
+
+    // For open-ended exercises
+    const [openEndedAnswers, setOpenEndedAnswers] = useState({}) // Map: pageIndex -> answer text
 
     const [lesson, setLesson] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -60,6 +67,75 @@ const LessonDetails = () => {
         fetchLesson()
     }, [id, lessons, token, authLoading])
 
+    // Check if lesson is complete and calculate XP
+    useEffect(() => {
+        if (!lesson || !lesson.pages) return
+
+        // Find all EXERCISE pages with their indices
+        const exercisePageIndices = lesson.pages
+            .map((page, idx) => ({ page, idx }))
+            .filter(({ page }) => page.pageType === 'EXERCISE')
+            .map(({ idx }) => idx)
+
+        console.log('Exercise page indices:', exercisePageIndices)
+        console.log('Feedbacks state:', feedbacks)
+
+        if (exercisePageIndices.length === 0) {
+            console.log('No exercise pages found')
+            return
+        }
+
+        // Check if all exercises have correct feedback
+        const allExercisesComplete = exercisePageIndices.every(
+            idx => feedbacks[idx]?.isCorrect === true
+        )
+
+        console.log('All exercises complete?', allExercisesComplete)
+
+        if (allExercisesComplete) {
+            // Calculate total XP from all correct exercises
+            const totalXp = exercisePageIndices.reduce((sum, idx) => {
+                return sum + (feedbacks[idx]?.xpEarned || 0)
+            }, 0)
+            
+            console.log('Setting completion with XP:', totalXp)
+            setTotalXpEarned(totalXp)
+            setIsLessonComplete(true)
+        } else {
+            setIsLessonComplete(false)
+        }
+    }, [feedbacks, lesson])
+
+    const handleCompleteLesson = async () => {
+        setCompletionSubmitting(true)
+        try {
+            const response = await fetch('/api/attempts/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    lessonId: lesson._id
+                })
+            })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Failed to complete lesson')
+            }
+            const result = await response.json()
+            
+            // Navigate back to lessons using React Router
+            navigate('/lessons')
+        } catch (error) {
+            console.error('Error completing lesson:', error)
+            alert(`Error: ${error.message}`)
+        } finally {
+            setCompletionSubmitting(false)
+        }
+    }
+
     return (
         <div className="lesson-details-page">
             <Link to="/lessons" className="back-button">← Back to Lessons</Link>
@@ -100,7 +176,7 @@ const LessonDetails = () => {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user.token}`
+                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify({
                         lessonId: lesson._id,
@@ -182,18 +258,48 @@ const LessonDetails = () => {
                 const result = await response.json()
 
                 // Update matches and feedback
-                setMatches({
+                const updatedMatches = {
                     ...matches,
                     [rightItemIndex]: draggedPairIndex
-                })
-                setMatchFeedback({
+                }
+                
+                const updatedMatchFeedback = {
                     ...matchFeedback,
                     [rightItemIndex]: {
                         isCorrect: isCorrect,
                         message: isCorrect ? '✓ Correct!' : '✗ Incorrect pair',
                         xpEarned: result.xpEarned || 0
                     }
-                })
+                }
+                
+                setMatches(updatedMatches)
+                setMatchFeedback(updatedMatchFeedback)
+
+                // Check if all pairs have been matched and all are correct
+                const totalPairs = currentPage.content.pairs.length
+                const matchedPairs = Object.keys(updatedMatches).length
+
+                if (matchedPairs === totalPairs) {
+                    // Check if all matches are correct
+                    const allCorrect = Object.values(updatedMatches).every((leftIdx, rightIdx) => 
+                        updatedMatchFeedback[rightIdx]?.isCorrect === true
+                    )
+                    
+                    if (allCorrect) {
+                        // Calculate total XP for this exercise
+                        const totalXp = Object.values(updatedMatchFeedback).reduce((sum, fb) => sum + (fb.xpEarned || 0), 0)
+                        
+                        // Mark this exercise as complete in feedbacks state
+                        setFeedbacks({
+                            ...feedbacks,
+                            [currentPageIndex]: {
+                                isCorrect: true,
+                                message: 'Perfect! You matched all pairs correctly!',
+                                xpEarned: totalXp
+                            }
+                        })
+                    }
+                }
             } catch (error) {
                 console.error('Error submitting match:', error)
             } finally {
@@ -208,6 +314,69 @@ const LessonDetails = () => {
             delete newFeedback[rightItemIndex]
             setMatches(newMatches)
             setMatchFeedback(newFeedback)
+            
+            // Clear exercise completion if matches are cleared
+            const newFeedbacks = { ...feedbacks }
+            delete newFeedbacks[currentPageIndex]
+            setFeedbacks(newFeedbacks)
+        }
+
+        const handleOpenEndedSubmit = async () => {
+            const userAnswer = openEndedAnswers[currentPageIndex]
+            
+            // Prevent submitting if already submitted or no answer provided
+            if (feedbacks[currentPageIndex] || !userAnswer?.trim()) return
+
+            setIsSubmitting(true)
+
+            try {
+                // Check if answer matches any acceptable answer (case-insensitive)
+                const acceptableAnswers = currentPage.content.acceptableAnswers || []
+                const normalizedUserAnswer = userAnswer.trim().toLowerCase()
+                const isCorrect = acceptableAnswers.some(
+                    answer => answer.toLowerCase() === normalizedUserAnswer
+                )
+
+                // Send attempt to server
+                const response = await fetch('/api/attempts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        lessonId: lesson._id,
+                        pageIndex: currentPageIndex,
+                        userAnswer: userAnswer,
+                        isCorrect: isCorrect
+                    })
+                })
+
+                const result = await response.json()
+
+                // Set feedback
+                setFeedbacks({
+                    ...feedbacks,
+                    [currentPageIndex]: {
+                        isCorrect: isCorrect,
+                        message: isCorrect 
+                            ? currentPage.content.characterReaction || '✓ Great job!'
+                            : `Try again. Hint: ${currentPage.content.hints?.[0] || 'Check your spelling and formatting'}`,
+                        xpEarned: result.xpEarned || 0
+                    }
+                })
+            } catch (error) {
+                console.error('Error submitting answer:', error)
+                setFeedbacks({
+                    ...feedbacks,
+                    [currentPageIndex]: {
+                        isCorrect: false,
+                        message: 'Error submitting answer. Please try again.'
+                    }
+                })
+            } finally {
+                setIsSubmitting(false)
+            }
         }
 
         return (
@@ -357,6 +526,16 @@ const LessonDetails = () => {
                                     placeholder="Type your answer in Korean..." 
                                     className="answer-input"
                                     rows="4"
+                                    value={openEndedAnswers[currentPageIndex] || ''}
+                                    onChange={(e) => {
+                                        // Prevent changes if already submitted
+                                        if (feedbacks[currentPageIndex]) return
+                                        setOpenEndedAnswers({
+                                            ...openEndedAnswers,
+                                            [currentPageIndex]: e.target.value
+                                        })
+                                    }}
+                                    disabled={!!feedbacks[currentPageIndex] || isSubmitting}
                                 ></textarea>
                                 {currentPage.content.hints && currentPage.content.hints.length > 0 && (
                                     <div className="hints">
@@ -368,14 +547,69 @@ const LessonDetails = () => {
                                         </ul>
                                     </div>
                                 )}
-                                <button className="submit-button">Submit Answer</button>
+                                {feedbacks[currentPageIndex] && (
+                                    <div className={`feedback ${feedbacks[currentPageIndex].isCorrect ? 'correct-feedback' : 'incorrect-feedback'}`}>
+                                        <div className="feedback-header">
+                                            <strong>{feedbacks[currentPageIndex].isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong>
+                                        </div>
+                                        <p>{feedbacks[currentPageIndex].message}</p>
+                                        {!feedbacks[currentPageIndex].isCorrect && (
+                                            <button onClick={() => {
+                                                const newAnswers = { ...openEndedAnswers }
+                                                const newFeedbacks = { ...feedbacks }
+                                                delete newAnswers[currentPageIndex]
+                                                delete newFeedbacks[currentPageIndex]
+                                                setOpenEndedAnswers(newAnswers)
+                                                setFeedbacks(newFeedbacks)
+                                            }} className="try-again-button">
+                                                Try Again
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                                {!feedbacks[currentPageIndex] && (
+                                    <button 
+                                        className="submit-button"
+                                        onClick={handleOpenEndedSubmit}
+                                        disabled={isSubmitting || !openEndedAnswers[currentPageIndex]?.trim()}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit Answer'}
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
                 )}
             </div>
 
+            {/* Completion Screen */}
+            {isLessonComplete && (
+                <div className="lesson-completion-screen">
+                    <div className="completion-content">
+                        <div className="completion-header">
+                            <h2>🎉 Lesson Complete!</h2>
+                            <p>Amazing work! You've completed all exercises.</p>
+                        </div>
+                        <div className="xp-reward">
+                            <div className="xp-amount">+{totalXpEarned} XP</div>
+                            <p className="xp-label">Experience Points Earned</p>
+                        </div>
+                        <div className="completion-message">
+                            <p>You're making great progress in learning Korean!</p>
+                        </div>
+                        <button 
+                            onClick={handleCompleteLesson}
+                            disabled={completionSubmitting}
+                            className="completion-button"
+                        >
+                            {completionSubmitting ? 'Completing...' : 'Continue'}
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Navigation */}
+            {!isLessonComplete && (
             <div className="page-navigation">
                 <button 
                     onClick={handlePrevious} 
@@ -395,6 +629,7 @@ const LessonDetails = () => {
                     Next →
                 </button>
             </div>
+            )}
             </>
         )
         })()}

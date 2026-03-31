@@ -990,3 +990,122 @@
   flex: 1;
   text-align: center;
 }
+
+/* Lesson Completion Screen */
+.lesson-completion-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.completion-content {
+  background: linear-gradient(180deg, #ffffff 0%, #f2f7ff 100%);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.3);
+  text-align: center;
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.completion-header h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+  color: #123b7a;
+}
+
+.completion-header p {
+  margin: 0 0 2rem 0;
+  color: #3f5f96;
+  font-size: 1rem;
+}
+
+.xp-reward {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+}
+
+.xp-amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+.xp-label {
+  margin: 0.5rem 0 0 0;
+  color: #ffffff;
+  font-weight: 600;
+  opacity: 0.95;
+  font-size: 0.95rem;
+}
+
+.completion-message {
+  margin: 2rem 0;
+}
+
+.completion-message p {
+  margin: 0;
+  color: #3f5f96;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.completion-button {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.completion-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.3);
+}
+
+.completion-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.completion-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

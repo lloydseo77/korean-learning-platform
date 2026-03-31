@@ -1,19 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthContext } from '../hooks/useAuthContext'
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login, error, loading } = useAuthContext()
+  const { login, error, loading, user } = useAuthContext()
   const navigate = useNavigate()
+
+  // Redirect to dashboard once user is logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/')
+    }
+  }, [user, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     await login(email, password)
-    if (!error) {
-      navigate('/lessons')
-    }
   }
 
   return (
