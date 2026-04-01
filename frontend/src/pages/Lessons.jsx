@@ -21,7 +21,7 @@ const Lessons = () => {
     const fetchLessons = async () => {
       dispatch({ type: 'SET_LOADING' })
       try {
-        const response = await fetch('/api/lessons', {
+        const response = await fetch(`${API_URL}/api/lessons`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

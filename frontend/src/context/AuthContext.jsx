@@ -28,6 +28,7 @@ const authReducer = (state, action) => {
 
 export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(authReducer, initialState)
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
     // login function
     const login = async (email, password) => {
