@@ -1,5 +1,7 @@
 import { createContext, useReducer, useContext, useEffect } from 'react'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
 export const AuthContext = createContext()
 
 const initialState = {
@@ -31,7 +33,7 @@ export const AuthContextProvider = ({ children }) => {
     const login = async (email, password) => {
         dispatch({ type: 'SET_LOADING' })
         try {
-            const response = await fetch('/api/auth/login', {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
@@ -52,7 +54,7 @@ export const AuthContextProvider = ({ children }) => {
     const register = async (email, password, name) => {
         dispatch({ type: 'SET_LOADING' })
         try {
-            const response = await fetch('/api/auth/register', {
+            const response = await fetch(`${API_URL}/api/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password, name })
@@ -84,7 +86,7 @@ export const AuthContextProvider = ({ children }) => {
             return
         }
         try {
-            const response = await fetch('/api/auth/me', {
+            const response = await fetch(`${API_URL}/api/auth/me`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` }
             })

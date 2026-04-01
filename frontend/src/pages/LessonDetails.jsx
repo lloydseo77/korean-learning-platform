@@ -3,6 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useLessonsContext } from '../hooks/useLessonsContext'
 import { useAuthContext } from '../hooks/useAuthContext'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+
 const LessonDetails = () => {
     const { id } = useParams()
     const navigate = useNavigate()
@@ -46,7 +48,7 @@ const LessonDetails = () => {
         // If not in context, fetch directly from API
         const fetchLesson = async () => {
             try {
-                const response = await fetch(`/api/lessons/${id}`, {
+                const response = await fetch(`${API_URL}/api/lessons/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -109,7 +111,7 @@ const LessonDetails = () => {
     const handleCompleteLesson = async () => {
         setCompletionSubmitting(true)
         try {
-            const response = await fetch('/api/attempts/complete', {
+            const response = await fetch(`${API_URL}/api/attempts/complete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,7 +174,7 @@ const LessonDetails = () => {
             setIsSubmitting(true)
 
             try {
-                const response = await fetch('/api/attempts', {
+                const response = await fetch(`${API_URL}/api/attempts`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -241,7 +243,7 @@ const LessonDetails = () => {
 
             // Send attempt to server
             try {
-                const response = await fetch('/api/attempts', {
+                const response = await fetch(`${API_URL}/api/attempts`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -338,7 +340,7 @@ const LessonDetails = () => {
                 )
 
                 // Send attempt to server
-                const response = await fetch('/api/attempts', {
+                const response = await fetch(`${API_URL}/api/attempts`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
