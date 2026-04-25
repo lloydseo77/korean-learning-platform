@@ -41,6 +41,43 @@ const getUserProgress = async (req, res) => {
   }
 }
 
+// Reset a specific lesson's progress
+const resetLessonProgress = async (req, res) => {
+  try {
+    const userId = req.userId
+    const { lessonId } = req.params
+
+    const userProgress = await UserProgress.findOne({ userId })
+    
+    if (!userProgress) {
+      return res.status(404).json({ error: 'User progress not found' })
+    }
+
+    // Remove from completed lessons
+    userProgress.lessonsCompleted = userProgress.lessonsCompleted.filter(
+      id => id.toString() !== lessonId
+    )
+
+    // Reset lesson progress entry
+    const lessonProgress = userProgress.lessonProgress.find(
+      lp => lp.lessonId.toString() === lessonId
+    )
+    
+    if (lessonProgress) {
+      lessonProgress.isCompleted = false
+      lessonProgress.completedAt = null
+      lessonProgress.attemptsMade = 0
+    }
+
+    await userProgress.save()
+    res.json({ message: 'Lesson progress reset', userProgress })
+  } catch (error) {
+    console.error('Error resetting lesson progress:', error)
+    res.status(500).json({ error: error.message })
+  }
+}
+
 module.exports = {
-  getUserProgress
+  getUserProgress,
+  resetLessonProgress
 }

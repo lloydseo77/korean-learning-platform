@@ -69,8 +69,8 @@
 /* Completion Badge */
 .completion-badge {
   position: absolute;
-  top: -12px;
-  right: -12px;
+  top: -20px;
+  right: -14px;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -96,6 +96,32 @@
 
 .completion-badge .xp-earned {
   font-size: 0.8rem;
+}
+
+.reset-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.5);
+  transform: rotate(180deg);
+}
+
+.reset-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .dashboard {
