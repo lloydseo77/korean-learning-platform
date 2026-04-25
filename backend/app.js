@@ -6,6 +6,7 @@ const lessonRoutes = require('./routes/lessons')
 const authRoutes = require('./routes/auth')
 const unitRoutes = require('./routes/units')
 const attemptRoutes = require('./routes/attempts')
+const progressRoutes = require('./routes/progress')
 
 const app = express()
 
@@ -41,5 +42,6 @@ app.use('/api/lessons', lessonRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/units', unitRoutes)
 app.use('/api/attempts', attemptRoutes)
+app.use('/api/progress', progressRoutes)
 
 module.exports = app
