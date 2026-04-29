@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import LessonDetails from './pages/LessonDetails'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/lessons" element={<Lessons />} />
       <Route path="/lessons/:id" element={<LessonDetails />} />
+      <Route path="/profile" element={<Profile />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
     </Routes>
